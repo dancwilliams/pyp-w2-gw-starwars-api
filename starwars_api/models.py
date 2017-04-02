@@ -98,7 +98,7 @@ class BaseQuerySet(object):
         self.current_page += 1
     
         # request next page in a generic way. Similar to what we did in BaseModel
-        method_name = 'get_{}'.format(self.RESOURCE_NAME
+        method_name = 'get_{}'.format(self.RESOURCE_NAME)
         method = getattr(api_client, method_name)
         json_data = method(**{'page': self.current_page})
     
