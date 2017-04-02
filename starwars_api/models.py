@@ -66,6 +66,7 @@ class BaseQuerySet(object):
     def __init__(self):
         self.current_page = 0
         self.current_element = 0
+        self.counter = None
         self.objects = []
 
     def __iter__(self):
@@ -101,6 +102,7 @@ class BaseQuerySet(object):
         method_name = 'get_{}'.format(self.RESOURCE_NAME)
         method = getattr(api_client, method_name)
         json_data = method(**{'page': self.current_page})
+        self.counter = json_data['count']
     
         # remember that each element in `self.objects` needs to be an instance
         # of the proper Model class. For that we will instantiate the Model class
@@ -115,7 +117,9 @@ class BaseQuerySet(object):
         If the counter is not persisted as a QuerySet instance attr,
         a new request is performed to the API in order to get it.
         """
-        pass
+        if not self.counter:
+            self._request_next_page()
+        return self.counter
 
 
 class PeopleQuerySet(BaseQuerySet):
