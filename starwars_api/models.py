@@ -1,3 +1,5 @@
+import six
+
 from starwars_api.client import SWAPIClient
 from starwars_api.exceptions import SWAPIClientError
 
@@ -11,7 +13,7 @@ class BaseModel(object):
         Dynamically assign all attributes in `json_data` as instance
         attributes of the Model.
         """
-        for key, value in json_data.items():
+        for key, value in six.iteritems(json_data):
             setattr(self, key, value)
 
     @classmethod
@@ -20,7 +22,12 @@ class BaseModel(object):
         Returns an object of current Model requesting data to SWAPI using
         the api_client.
         """
-        pass
+        
+        #method = getattr(api_client, 'get_{}'.format(cls.RESOURCE_NAME))
+        method_name = 'get_{}'.format(cls.RESOURCE_NAME)
+        method = getattr(api_client, method_name)
+        json_data = method(resource_id)
+        return cls(json_data)
 
     @classmethod
     def all(cls):
@@ -29,7 +36,8 @@ class BaseModel(object):
         later in charge of performing requests to SWAPI for each of the
         pages while looping.
         """
-        pass
+        qs = '{}QuerySet'.format(cls.RESOURCE_NAME.title())
+        return eval(qs)()
 
 
 class People(BaseModel):
